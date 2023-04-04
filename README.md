@@ -1,6 +1,6 @@
 ### Project 3 Udacity - Advanced Cloud Devops
-### Built With
 
+### Built With
 - [Circle CI](www.circleci.com) - Cloud-based CI/CD service
 - [Amazon AWS](https://aws.amazon.com/) - Cloud services
 - [AWS CLI](https://aws.amazon.com/cli/) - Command-line tool for AWS
@@ -8,6 +8,3 @@
 - [Ansible](https://www.ansible.com/) - Configuration management tool
 - [Prometheus](https://prometheus.io/) - Monitoring tool
 
-### License
-
-[License](LICENSE.md)
