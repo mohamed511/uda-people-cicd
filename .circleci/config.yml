@@ -1,17 +1,27 @@
 version: 2.1
 
-# commands:
-#   destroy-environment:
-#     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
-#     parameters:
-#       # Add parameter here   
-#     steps:
-#       - run:
-#           name: Destroy environments
-#           when: on_fail
-#           command: |
-#             # Your code here
-#             exit 1
+orbs:
+  slack: circleci/slack@4.1
+
+commands:
+  notify_on_failure:
+    steps:
+      - slack/notify:
+          event: fail
+          channel: project3
+          template: basic_fail_1
+
+  # destroy-environment:
+  #   description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
+  #   parameters:
+  #     # Add parameter here   
+  #   steps:
+  #     - run:
+  #         name: Destroy environments
+  #         when: on_fail
+  #         command: |
+  #           # Your code here
+  #           exit 1
 
 #   revert-migrations:
 #     description: Revert the last migration if successfully run in the current workflow.
@@ -49,6 +59,7 @@ jobs:
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-deps
+      - notify_on_failure
 
   build-backend:
     docker:
@@ -65,7 +76,8 @@ jobs:
              npm run build
       - save_cache:
           paths: [backend/node_modules]
-          key: backend-deps
+          key: backend-deps4
+      - notify_on_failure          
 
   test-frontend:
     docker:
@@ -80,6 +92,7 @@ jobs:
             cd frontend
             npm install
             npm test
+      - notify_on_failure
 
   test-backend:
     docker:
@@ -94,7 +107,8 @@ jobs:
              cd backend
              npm install
              npm test
-            
+      - notify_on_failure           
+
   scan-frontend:
     docker:
       - image: cimg/node:13.8.0
@@ -110,6 +124,7 @@ jobs:
             npm audit fix --force --audit-level=critical
             npm audit fix --force --audit-level=critical
             npm audit --audit-level=critical
+      - notify_on_failure
 
   scan-backend:
     docker:
@@ -126,6 +141,7 @@ jobs:
              npm audit fix --force --audit-level=critical
              npm audit fix --force --audit-level=critical
              npm audit --audit-level=critical
+      - notify_on_failure
 
 #   deploy-infrastructure:
 #     docker:
@@ -292,6 +308,14 @@ jobs:
 #               # your code here
 #             fi
             
+  notify_on_sucess:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - slack/notify:
+          event: pass
+          channel: project3
+          template: success_tagged_deployment_1
 
 workflows:
   default:
@@ -306,6 +330,12 @@ workflows:
           requires: [build-backend]
       - scan-frontend:
           requires: [build-frontend]
+      - notify_on_sucess:
+          requires:
+            - test-frontend
+            - test-backend
+            - scan-backend
+            - scan-frontend
       # - deploy-infrastructure:
       #     requires: [test-frontend, test-backend, scan-frontend, scan-backend]
       #     filters:
