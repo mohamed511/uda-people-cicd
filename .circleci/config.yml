@@ -63,7 +63,8 @@ commands:
           when: on_fail
           command: |
             SUCCESS=$(curl --insecure https://kvdb.io/${KVDB_BUCKET}/migration_<< parameters.Workflow_ID >>)
-            if(( $SUCCESS==1 )); 
+            # if(( $SUCCESS==1 ));
+            if [[ "${SUCCESS}" == "1" ]] 
             then
               cd ~/project/backend
               npm install
@@ -348,7 +349,7 @@ jobs:
             export API_URL=http://${BACKEND_PUBLIC_IP}:3030 
             if curl -s $API_URL/api/status | grep "ok"
             then
-              exit 0
+              exit 1
             else
               exit 1
             fi
